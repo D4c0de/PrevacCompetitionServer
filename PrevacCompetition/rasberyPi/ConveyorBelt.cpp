@@ -11,15 +11,15 @@ Belt::Belt(Item::Piece* input, int amount)
 	setUpThings();
 }
 
-float Belt::nextTick()
+double Belt::nextTick()
 {
-	float t = this->timer;
-	float in = this->inFurnaceTime;
+	double t = this->timer;
+	double in = this->inFurnaceTime;
 	if (inFurnaceTime < 0)
 	{
 		return -1;
 	}
-	float ret = (t / in);
+	double ret = (t / in);
 	this->timer++;
 	if (ret > 0.98) {
 		return -1;
@@ -34,7 +34,7 @@ void Belt::startHeat()
 
 	//turn of furnace on max heatpower
 }
-void Belt::startHeat(float power) {
+void Belt::startHeat(double power) {
 	
 	//set % of heatpower
 }
@@ -47,21 +47,21 @@ void Belt::setUpThings()
 		return;//Too Many Pieces
 	};
 
-	float tempDiff{ piece->targetTemperature - roomTemperature };
+	double tempDiff{ piece->targetTemperature - roomTemperature };
 	if (tempDiff < 0) {
 		return;//Furnace is hotter then need
 	}
 	else
 	{
-		float airMass = (furnaceSize - piece->GetSize() * quanity);
+		double airMass = (furnaceSize - piece->GetSize() * quanity);
 		if (airMass < 0)
 		{
 			return;//"this error shuldend be in real sim"
 		}
-		float energyInFurnace{ (airMass * (FurnaceTemperature + 1) * airSpecificHeat) };
+		double energyInFurnace{ (airMass * (FurnaceTemperature + 1) * airSpecificHeat) };
 
-		float energyForPieces{ piece->mass * piece->specificHeat * tempDiff * quanity };
-		float energyForAir{ airMass * airSpecificHeat * tempDiff };
+		double energyForPieces{ piece->mass * piece->specificHeat * tempDiff * quanity };
+		double energyForAir{ airMass * airSpecificHeat * tempDiff };
 
 		inFurnaceTime = (energyForAir + energyForPieces - energyInFurnace) / (furnacePower * efficiency);
 		if (inFurnaceTime < 0)
@@ -73,7 +73,7 @@ void Belt::setUpThings()
 }
 int Belt::maxNoOfPieces()
 {
-	float przekatna= 2* piece->radius;
+	double przekatna= 2* piece->radius;
 
 	int maxPerPlate = floor(przekatna / plateWidth)*floor(przekatna/plateWidth);
 

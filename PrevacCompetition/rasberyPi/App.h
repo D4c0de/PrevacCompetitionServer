@@ -14,7 +14,6 @@ namespace MainApp {
 	public:
 		App();
 		~App();
-		
 		Conn* modbus;
 		Item::Pieces* pieces;
 		void SetUpThings();
