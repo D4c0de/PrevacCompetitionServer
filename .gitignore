@@ -1,0 +1,41 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.vcxproj*
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+#folders
+/ARM/*
+/PrevacCompetition/ARM
+/PrevacCompetition/Debug
+/PrevacCompetition/x64
+/PrevacCompetition/RC*
+/PrevacCompetition/libmodbus
+/x64
+/.vs
