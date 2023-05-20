@@ -1,5 +1,7 @@
 #pragma once
+#pragma once
 #include "Piece.h"
+#include "control.h"
 class Belt
 {
 public:
@@ -15,10 +17,13 @@ public:
 	int thirdTemperature;
 	double inFurnaceTime;
 
-	void startHeat();
-	void startHeat(double power);
-	double nextTick();
 
+	void sendToFurnace();
+	void sendToPress();
+	void sendToSorter();
+	void startHeat();
+	void startHeat(int power);
+	double nextTick();
 private:
 	int maxNoOfPieces();
 	void setUpThings();

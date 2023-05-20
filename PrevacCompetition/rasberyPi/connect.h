@@ -15,13 +15,15 @@ struct Conn
 	Conn(std::string,int);
 	~Conn();
 	void connect(const char*,int);
-	void readRC();
+	static void readRC(Conn*);
+
 	void disconnect();
 	static std::vector<int> reg_read_ten(Conn*, int);
 	static std::vector<int>* reg_read_muliple(Conn*, int, int);
+
 	static int reg_read_single(Conn*, int);
 	static void reg_clear(Conn*,int);
-	static void reg_write(Conn*,int,std::string);
+	static void reg_write(Conn*,int,int,std::string);
 	static void reg_write(Conn*, int, int);
 	static void reg_write_Second(Conn*, int);
 };

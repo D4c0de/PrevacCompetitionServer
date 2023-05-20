@@ -1,37 +1,16 @@
 #pragma once
 
 #include "FileOperation.h"
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
 
-
-/*
-#include <string>
-#include <vector>
-#include <iostream>
-#include "Piece.h"
-#include "connect.h"
-*/
 namespace input
 {
-	void s(int time) {  //using coz i like to debug on Windows :D
-#ifdef _WIN32
-		Sleep(time);
-#else
-		sleep(time / 1000);
-#endif
-	}
-
-	int* input(Conn* modbus, Item::Pieces* pieces) {
+	int* input(Conn* modbus,FileOperation* database) {
 
 
 		std::vector<int> reg;
 		while (true)
 		{
-			modbus->readRC();
+			Conn::readRC(modbus);
 			reg = Conn::reg_read_ten(modbus, 0);
 			if (reg[0] == 1) // run program
 			{
@@ -56,12 +35,11 @@ namespace input
 				Conn::reg_clear(modbus, 0);
 				reg = Conn::reg_read_ten(modbus, 1);
 
-				float heat = reg[0];
+				double heat = reg[0];
 				int mass{ reg[1] }, temp{ reg[2] }, radius{ reg[3] };
 
 				Conn::reg_clear(modbus, 1);
-				FileOperation::WriteToFile(name, heat, mass, temp, radius);
-				pieces->add(Item::Piece(name, heat, mass, temp, radius));
+				Conn::reg_write_Second(modbus,database->Insert(name, heat, mass, temp, radius));
 				std::cout << "Added new type " << name << "\n";
 			}
 
@@ -69,13 +47,19 @@ namespace input
 			{
 				
 				Conn::reg_clear(modbus, 0);
-				if (pieces->tab.size() > 0)
+				int size = database->getSize();
+				if (size > 0)
 				{
-					Conn::reg_write(modbus, 1, pieces->tab.size());
-					for (int i = 0; i < pieces->tab.size(); i++)
+					Conn::reg_write(modbus, 1, size);
+
+					std::vector<Item::Piece>* temp = database->getPiece();
+					for (int i = 0; i < temp->size(); i++)
 					{
-						Conn::reg_write(modbus, i + 1, pieces->get(i)->color);
+
+						Conn::reg_write(modbus, i + 1, (*temp)[i].ID, (*temp)[i].color);
 					}
+					delete temp;
+
 				}
 				else
 				{
@@ -84,11 +68,6 @@ namespace input
 				std::cout << "Sended data to slave\n";
 				
 			}
-			else
-			{
-				//s(2000);
-			}
 		}
-
 	};
 }

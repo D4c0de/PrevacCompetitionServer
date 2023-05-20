@@ -1,69 +1,73 @@
-
 #include "App.h"
 #include "input.h"
-#include <thread>
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
+#include <chrono>
 
-
-MainApp::App::App(){
+MainApp::App::App() {
 
 	modbus = new Conn();
-	this->pieces = new Item::Pieces();
-	SetUpThings();
+	DataBase = new FileOperation();
 }
 
 MainApp::App::~App()
 {
 	delete modbus;
-	delete pieces;
-}
-
-void MainApp::App::SetUpThings()
-{
-	this->pieces->load();
+	delete DataBase;
 }
 
 bool MainApp::App::run() {
 
-	int* in = input::input(modbus, pieces);
-	try
-	{
-		Belt belt = Belt(pieces->get(0[in]), 1[in]);// ARGS: piece, amount
-		delete[] in;
-		belt.startHeat(); // tak dla beki
+	int* in = input::input(modbus, DataBase);
+	Belt belt = Belt(DataBase->getPiece(0[in]), 1[in]);// ARGS: piece, amount
+	delete[] in;
+	Conn::reg_write(modbus, 0, 11);
+	Conn::readRC(modbus);
+	belt.sendToFurnace();
+	Conn::reg_write(modbus, 0, 12);
+	Conn::readRC(modbus);
 
-		float loading = belt.nextTick();
-
-		int last = (int)(loading * 100);
-		do {
-			if (last != (int)(loading * 100))
-			{
-				last = (int)(loading * 100);
-				Conn::reg_write_Second(modbus, loading * 100);
-			}
-			input::s(time);
-			loading = belt.nextTick();
-
-		} while (loading >= 0);
-		belt.startHeat(0.1);
-		for (int i = 0; i < 30; i++)
+	belt.startHeat();
+	auto start2 = std::chrono::high_resolution_clock::now();
+	double loading = belt.nextTick();
+	int last = (int)(loading * 100);
+	do {
+		Conn::readRC(modbus);
+		auto start = std::chrono::high_resolution_clock::now();
+		if (last != (int)(loading * 100))
 		{
-			input::s(time);
+			last = (int)(loading * 100);
+			Conn::reg_write_Second(modbus, loading * 100);
+
 		}
-		Conn::reg_write_Second(modbus, 100);
-		std::cout << "task succesfull\n";
+		auto end = std::chrono::high_resolution_clock::now();
+		while (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - start).count() < time) {}
+		if (std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start2).count() < 2)
+		{
+			start2 = std::chrono::high_resolution_clock::now();
+		}
+		loading = belt.nextTick();
+	} while (loading >= 0);
+	Conn::readRC(modbus);
+	belt.startHeat(10);
 
+	for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 3; i++)
+		{
+			auto start = std::chrono::high_resolution_clock::now();
+			while (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - start).count() < time) {}
+		}
+		Conn::readRC(modbus);
 	}
-	catch (const std::exception&)
-	{
-		
-			Conn::reg_write_Second(modbus, 404);
-			std::cout << "task faild\n";
+	Conn::reg_write_Second(modbus, 100);
+	Conn::readRC(modbus);
+	Conn::reg_write(modbus, 0, 13);
+	Conn::readRC(modbus);
+	belt.sendToPress();
+	Conn::reg_write(modbus, 0, 14);
+	Conn::readRC(modbus);
+	belt.sendToSorter();
+	Conn::reg_write(modbus, 0, 15);
+	Conn::readRC(modbus);
 
-	}
+	std::cout << "task succesfull\n";
 	return true;
 }

@@ -1,108 +1,35 @@
 #include <vector>
 #include <string>
 #include "Piece.h"
-#include "FileOperation.h"
 
 
 Item::Piece::Piece()
 {
-	
+	ID = NULL;
+	color = "";
+	specificHeat = NULL;
+	mass = NULL;
+	targetTemperature = NULL;
+	radius = NULL;
 }
 
-Item::Piece::Piece(const std::string& bufor)
+Item::Piece::Piece(int id,std::string name, double value, double mass, double temp, double radius)
 {
-	int i = 0;
-	std::string input;
-	while (bufor[i] != *" ")
-	{
-		input += bufor[i];
-		i++;
-	}
-	color = input;
-	input.clear();
-	i++;
-	while (bufor[i] != *" ")
-	{
-		input += bufor[i];
-		i++;
-	}
-	specificHeat = std::stof(input);
-	i++;
-	input.clear();
-	while (bufor[i] != *" ")
-	{
-		input += bufor[i];
-		i++;
-	}
-	mass = std::stoi(input);
-	mass /= 1000;
-	i++;
-	input.clear();
-	while (bufor[i] != *" ")
-	{
-		input += bufor[i];
-		i++;
-	}
-	radius = std::stoi(input);
-	radius /= 1000;
-	i++;
-	input.clear();
-	while (bufor[i] != *" ")
-	{
-		input += bufor[i];
-		i++;
-		if (i == bufor.size())
-		{
-			break;
-		}
-	}
-	targetTemperature = std::stoi(input);
-}
-
-Item::Piece::Piece(std::string name, float value, int mass, int temp, int radius)
-{
+	this->ID = id;
 	this->color = name;
-	this->mass = mass;
-	this->radius = radius;
-	this->targetTemperature = temp;
 	this->specificHeat = value;
+	this->mass = mass;
+	this->targetTemperature = temp;
+	this->radius = radius;
 }
 
 Item::Piece::~Piece()
 {
 }
 
-float Item::Piece::GetSize()
+double Item::Piece::GetSize()
 {
-	float size;
-	size = radius * radius * 3, 14;
+	double size;
+	size = radius * radius * 3.14;
 	return size;
-}
-
-
-//pieces
-Item::Pieces::Pieces()
-{
-}
-
-Item::Pieces::~Pieces()
-{
-}
-
-void Item::Pieces::add(Piece added)
-{
-	tab.push_back(added);
-}
-
-Item::Piece* Item::Pieces::get(int no)
-{
-
-	return &tab[no];
-}
-
-void Item::Pieces::load()
-{
-	FileOperation::ReadFromFile(&tab);
-
-	return;
 }

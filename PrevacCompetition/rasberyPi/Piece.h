@@ -8,28 +8,16 @@ namespace Item {
 	struct Piece
 	{
 		Piece();
-		Piece(const std::string&);
-		Piece(std::string, float, int, int, int);
+		Piece(int,std::string, double, double, double, double);
 		~Piece();
-		float GetSize();
+		double GetSize();
+		int ID;
 		std::string color;
-		float radius;
-		float mass;
-		int targetTemperature;
-		int specificHeat;
+		double radius;
+		double mass;
+		double targetTemperature;
+		double specificHeat;
 		const double high=0.2;
-	};
-
-	struct Pieces
-	{
-		Pieces();
-		~Pieces();
-
-
-		std::vector<Piece> tab;
-		void add(Piece);
-		Piece* get(int);
-		void load();
 	};
 
 }

@@ -60,17 +60,17 @@ void Conn::connect(const char *ip,int port)
 	}
 	
 }
-void Conn::readRC() {
+void Conn::readRC(Conn* modbus) {
 
 	do {
-		rc = modbus_receive(ctx, request);
-	} while (rc == 0);
-	if (rc < 0) {
+		modbus->rc = modbus_receive(modbus->ctx, modbus->request);
+	} while (modbus->rc == 0);
+	if (modbus->rc < 0) {
 		perror("Error in modbus receive");
 	}
-	printf("Request received rc= %d\n", rc);
-	ret = modbus_reply(ctx, request, rc, mb_mapping);//rc, request size must be given back to modbus_reply as well as "request" data
-	if (ret < 0) {
+	printf("Request received rc= %d\n", modbus->rc);
+	modbus->ret = modbus_reply(modbus->ctx, modbus->request, modbus->rc, modbus->mb_mapping);//rc, request size must be given back to modbus_reply as well as "request" data
+	if (modbus->ret < 0) {
 		perror("modbus reply error");
 	}
 }
@@ -105,7 +105,7 @@ std::vector<int>* Conn::reg_read_muliple(Conn* con, int start, int nb)
 
 int Conn::reg_read_single(Conn* con, int start)
 {
-	return *(con->registers)[start];
+	return (*con->registers)[start];
 }
 
 void Conn::reg_clear(Conn* con, int start)
@@ -117,8 +117,9 @@ void Conn::reg_clear(Conn* con, int start)
 
 }
 
-void Conn::reg_write(Conn* con, int start, std::string str)
+void Conn::reg_write(Conn* con, int start,int id, std::string str)
 {
+	(*con->registers)[(start * 10) + 0] = id;
 	int lenght = str.length();
 	for (int i = 0; i*2 < str.length(); i++)
 	{
@@ -133,7 +134,7 @@ void Conn::reg_write(Conn* con, int start, std::string str)
 		{
 			high = 0;
 		}
-		(*con->registers)[(start * 10) + i] = low+high;
+		(*con->registers)[(start * 10) + (i+1)] = low+high;
 
 	}
 }
