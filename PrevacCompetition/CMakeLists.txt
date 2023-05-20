@@ -42,3 +42,4 @@ set(RESOURCE_FILE
 
 # Dodaj wykonywalny plik
 add_executable(PrevacCompetition ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILE})
+target_link_libraries(PrevacCompetition modbus)
