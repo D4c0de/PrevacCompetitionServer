@@ -1,26 +1,25 @@
-
 #include "ConveyorBelt.h"
-#include <fstream>
 #include <math.h>
+#include "RSP.h"
 
 
-Belt::Belt(Item::Piece* input, int amount)
+Belt::Belt(Item::Piece* piece, int amount)
 {
-	this->piece = input;
+	this->piece =piece;
 	this->quanity = amount;
 	setUpThings();
 }
 
-float Belt::nextTick()
+double Belt::nextTick()
 {
-	float t = this->timer;
-	float in = this->inFurnaceTime;
+	double t = timer;
+	double in = inFurnaceTime;
 	if (inFurnaceTime < 0)
 	{
 		return -1;
 	}
-	float ret = (t / in);
-	this->timer++;
+	double ret = (t / in);
+	timer++;
 	if (ret > 0.98) {
 		return -1;
 	}
@@ -28,40 +27,33 @@ float Belt::nextTick()
 
 }
 
-
-void Belt::startHeat()
-{
-
-	//turn of furnace on max heatpower
-}
-void Belt::startHeat(float power) {
-	
-	//set % of heatpower
-}
-
 void Belt::setUpThings()
 {
-	getTemps();
+	std::vector<double>* temper = RSP::readTemperatureData();
+	roomTemperature = (*temper)[0];
+	FurnaceTemperature = (*temper)[1];
+	thirdTemperature = (*temper)[2];
+
 
 	if (maxNoOfPieces() < quanity) {
 		return;//Too Many Pieces
 	};
 
-	float tempDiff{ piece->targetTemperature - roomTemperature };
+	double tempDiff{ piece->targetTemperature - roomTemperature };
 	if (tempDiff < 0) {
 		return;//Furnace is hotter then need
 	}
 	else
 	{
-		float airMass = (furnaceSize - piece->GetSize() * quanity);
+		double airMass = (furnaceSize - piece->GetSize() * quanity);
 		if (airMass < 0)
 		{
 			return;//"this error shuldend be in real sim"
 		}
-		float energyInFurnace{ (airMass * (FurnaceTemperature + 1) * airSpecificHeat) };
+		double energyInFurnace{ (airMass * (FurnaceTemperature + 1) * airSpecificHeat) };
 
-		float energyForPieces{ piece->mass * piece->specificHeat * tempDiff * quanity };
-		float energyForAir{ airMass * airSpecificHeat * tempDiff };
+		double energyForPieces{ piece->mass * piece->specificHeat * tempDiff * quanity };
+		double energyForAir{ airMass * airSpecificHeat * tempDiff };
 
 		inFurnaceTime = (energyForAir + energyForPieces - energyInFurnace) / (furnacePower * efficiency);
 		if (inFurnaceTime < 0)
@@ -69,19 +61,48 @@ void Belt::setUpThings()
 			return;//"Error"
 		}
 	}
-	
+
 }
 int Belt::maxNoOfPieces()
 {
-	float przekatna= 2* piece->radius;
+	double przekatna = 2 * piece->radius;
 
-	int maxPerPlate = floor(przekatna / plateWidth)*floor(przekatna/plateWidth);
+	int maxPerPlate = floor(plateWidth / przekatna) * floor(plateWidth / przekatna);
 
-	return maxPerPlate*noOfPlates;
+	return maxPerPlate * noOfPlates;
 }
 Belt::~Belt()
 {
-	
+
+}
+
+void Belt::sendToFurnace()
+{
+	control::rspControll::SendFromWerhouse();
+}
+
+void Belt::sendToPress()
+{
+	control::rspControll::setFurnacePower(0);
+	for (int i = 0; i < quanity; i++)
+	{
+		control::rspControll::sendToPress();
+	}
+}
+
+void Belt::sendToSorter()
+{
+	control::rspControll::sendToSorter();
+}
+
+void Belt::startHeat()
+{
+	control::rspControll::setFurnacePower(100);
+	//turn of furnace on max heatpower
+}
+void Belt::startHeat(int power) {
+	control::rspControll::setFurnacePower(power);
+	//set % of heatpower
 }
 
 
@@ -89,54 +110,3 @@ Belt::~Belt()
 
 
 
-
-
-
-void Belt::getTemps() {
-	// TODO pobieranie danych z 1wire
-	/*
-	#include <wiringPi.h>
-	std::string thermometerAddresses[3] = {
-	"28-000000000001",
-	"28-000000000002",
-	"28-000000000003"
-	};
-	// Inicjalizacja biblioteki WiringPi
-	if (wiringPiSetup() == -1) {
-		std::cerr << "B³¹d inicjalizacji WiringPi" << std::endl;
-		return 1;
-	}
-	// Odczyt temperatury z termometrów
-	for (int i = 0; i < 3; i++) {
-		float temperature = readTemperature(thermometerAddresses[i]);
-		if (temperature != -1.0f) {
-			std::cout << "Termometr " << thermometerAddresses[i] << ": " << temperature << "°C" << std::endl;
-		}
-	}
-
-	float readTemperature(const std::string& address) {
-	std::string path = "/sys/bus/w1/devices/" + address + "/w1_slave";
-	FILE* file = fopen(path.c_str(), "r");
-	if (file == NULL) {
-		std::cerr << "Nie mo¿na otworzyæ pliku " << path << std::endl;
-		return -1.0f;
-	}
-
-	char line[256];
-	float temperature = -1.0f;
-	while (fgets(line, radiusof(line), file) != NULL) {
-		if (strstr(line, "t=") != NULL) {
-			temperature = std::stof(line + strstr(line, "t=") + 2) / 1000.0f;
-			break;
-		}
-	}
-
-	fclose(file);
-	return temperature;
-}
-
-	*/
-	roomTemperature = 20;
-	FurnaceTemperature = 20;
-	thirdTemperature = 20;
-}

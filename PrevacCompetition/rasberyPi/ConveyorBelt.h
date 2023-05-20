@@ -1,5 +1,7 @@
 #pragma once
+#pragma once
 #include "Piece.h"
+#include "control.h"
 class Belt
 {
 public:
@@ -10,25 +12,28 @@ public:
 	int quanity;
 	Item::Piece* piece;
 
-	float roomTemperature;
+	double roomTemperature;
 	int FurnaceTemperature;
 	int thirdTemperature;
-	float inFurnaceTime;
+	double inFurnaceTime;
 
+
+	void sendToFurnace();
+	void sendToPress();
+	void sendToSorter();
 	void startHeat();
-	void startHeat(float power);
-	float nextTick();
-
+	void startHeat(int power);
+	double nextTick();
 private:
 	int maxNoOfPieces();
 	void setUpThings();
 	void getTemps();
 	int timer = 0;
-	const float plateRadius = 0.5;
-	const float plateWidth = 0.5;
+	const double plateRadius = 0.5;
+	const double plateWidth = 0.5;
 	const int noOfPlates=5;
-	const float furnaceSize = 2;
+	const double furnaceSize = 2;
 	const int furnacePower = 2000;
-	const float efficiency = 0.8; // same shit as furnace time
-	const float airSpecificHeat = 1020;
+	const double efficiency = 0.8; // same shit as furnace time
+	const double airSpecificHeat = 1020;
 };
