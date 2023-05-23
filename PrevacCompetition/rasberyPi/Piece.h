@@ -8,6 +8,7 @@ namespace Item {
 	struct Piece
 	{
 		Piece();
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -17,6 +18,7 @@ namespace Item {
 		/// <param name="mass"></param>
 		/// <param name="specificHeat"></param>
 		/// <param name="TargetTemperature"></param>
+
 		Piece(int,std::string, double, double, double, double);
 		~Piece();
 		double GetSize();

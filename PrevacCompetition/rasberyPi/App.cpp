@@ -6,21 +6,27 @@ MainApp::App::App() {
 
 	modbus = new Conn();
 	DataBase = new FileOperation();
+
 	belt = nullptr;
+
+
 }
 
 MainApp::App::~App()
 {
 	delete modbus;
 	delete DataBase;
+
 }
 
 void MainApp::App::ServerStart(Conn* modbus)
 {
 	Conn::readRC(modbus);
+
 }
 
 bool MainApp::App::Run() {
+
 
 	try
 	{
@@ -89,4 +95,5 @@ void MainApp::App::End()
 	Conn::reg_write(modbus, 0, 15);
 	belt->sendToSorter();
 	Conn::reg_write(modbus, 0, 16);
+
 }

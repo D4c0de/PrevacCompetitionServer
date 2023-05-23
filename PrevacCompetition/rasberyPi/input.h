@@ -10,6 +10,9 @@ namespace input
 		std::vector<int> reg;
 		while (true)
 		{
+
+			Conn::readRC(modbus);
+
 			reg = Conn::reg_read_ten(modbus, 0);
 			if (reg[0] == 1) // run program
 			{
@@ -39,7 +42,9 @@ namespace input
 
 				Conn::reg_clear(modbus, 1);
 				Conn::reg_write_Second(modbus,database->Insert(name, heat, mass, temp, radius));
+
 				Conn::reg_write(modbus, 0, 11);
+
 				std::cout << "Added new type " << name << "\n";
 			}
 

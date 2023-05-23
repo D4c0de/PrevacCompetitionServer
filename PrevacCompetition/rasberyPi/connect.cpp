@@ -61,6 +61,7 @@ void Conn::connect(const char *ip,int port)
 	
 }
 void Conn::readRC(Conn* modbus) {
+
 	while (true) {
 		do {
 			modbus->rc = modbus_receive(modbus->ctx, modbus->request);
@@ -75,6 +76,7 @@ void Conn::readRC(Conn* modbus) {
 		if (modbus->ret < 0) {
 			perror("modbus reply error");
 		}
+
 	}
 }
 void Conn::disconnect()
@@ -111,10 +113,12 @@ std::vector<int>* Conn::reg_read_muliple(Conn* con, int start, int nb)
 
 int Conn::reg_read_single(Conn* con, int start)
 {
+
 	con->mtx.lock();
 	auto ret = (*con->registers)[start];
 	con->mtx.unlock();
 	return ret;
+
 }
 
 void Conn::reg_clear(Conn* con, int start)
@@ -129,7 +133,9 @@ void Conn::reg_clear(Conn* con, int start)
 
 void Conn::reg_write(Conn* con, int start,int id, std::string str)
 {
+
 	con->mtx.lock();
+
 	(*con->registers)[(start * 10) + 0] = id;
 	int lenght = str.length();
 	for (int i = 0; i*2 < str.length(); i++)

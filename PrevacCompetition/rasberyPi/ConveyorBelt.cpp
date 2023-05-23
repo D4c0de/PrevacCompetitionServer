@@ -30,7 +30,11 @@ double Belt::nextTick()
 
 void Belt::setUpThings()
 {
-	getTemps();
+	std::vector<double>* temper = RSP::readTemperatureData();
+	roomTemperature = (*temper)[0];
+	FurnaceTemperature = (*temper)[1];
+	thirdTemperature = (*temper)[2];
+
 
 
 	if (maxNoOfPieces() < quanity) {
@@ -60,6 +64,7 @@ void Belt::setUpThings()
 		}
 	}
 
+
 }
 void Belt::getTemps()
 {
@@ -68,6 +73,8 @@ void Belt::getTemps()
 	FurnaceTemperature = (*temper)[1];
 	thirdTemperature = (*temper)[2];
 	delete temper;
+
+
 }
 int Belt::maxNoOfPieces()
 {

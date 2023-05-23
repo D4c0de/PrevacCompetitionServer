@@ -13,6 +13,7 @@ Item::Piece::Piece()
 	radius = NULL;
 }
 
+
 Item::Piece::Piece(int id,std::string name, double radius, double mass, double specificHeat, double targetTemperature)
 {
 	this->ID = id;
@@ -20,16 +21,20 @@ Item::Piece::Piece(int id,std::string name, double radius, double mass, double s
 	this->specificHeat = specificHeat;
 	this->mass = mass;
 	this->targetTemperature = targetTemperature;
+=
+
 	this->radius = radius;
 }
 
 Item::Piece::~Piece()
 {
 }
+
 /// <summary>
 /// 
 /// </summary>
 /// <returns>Size of pieces m^2</returns>
+
 double Item::Piece::GetSize()
 {
 	double size;
