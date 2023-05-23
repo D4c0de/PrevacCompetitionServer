@@ -32,6 +32,7 @@ int callback_size(void* data, int argc, char** argv, char** azColName) {
 int zero(void* NotUsed, int argc, char** argv, char** azColName) {
 	return 0;
 }
+
 int insertId(void* data, int argc, char** argv, char** azColName) {
 	int* id = static_cast<int*>(data);
 	for (int i = 0; i < argc; i ++) {
@@ -39,6 +40,7 @@ int insertId(void* data, int argc, char** argv, char** azColName) {
 	}
 	return 0;
 }
+
 FileOperation::FileOperation()
 {
 	ErrMsg = nullptr;
@@ -51,6 +53,7 @@ FileOperation::FileOperation()
 	{
 		createTable();
 	}
+
 }
 
 FileOperation::~FileOperation()
@@ -59,12 +62,15 @@ FileOperation::~FileOperation()
 }
 
 
+
 int FileOperation::Insert(std::string name, double specificHeat, int mass, int temp, int radius)
 {
-	int id;
+	int id=getSize()+1;
 	std::stringstream query{};
-	query << "INSERT INTO Pieces(Color, Radius, Mass, SpecificHeat, TargetTemperatre) VALUES('" << name << "',"<< ((double)radius / 100)<<"," <<(double)mass/1000<<","<< specificHeat <<"," << (temp/10)<<");";
-	rc = sqlite3_exec(db, query.str().c_str(), insertId, &id, &ErrMsg);
+	query << "INSERT INTO Pieces(ID,Color, Radius, Mass, SpecificHeat, TargetTemperatre) "
+		  << "VALUES("<< id <<", '" << name << "', "<< ((double)radius / 100)<<", " <<(double)mass/1000<<", "<< specificHeat <<", " << (temp/10)<<"); ";
+	rc = sqlite3_exec(db, query.str().c_str(), zero, &id, &ErrMsg);
+
 	if (rc!=SQLITE_OK)
 	{
 		std::cout << "problem with inserting";
@@ -72,7 +78,9 @@ int FileOperation::Insert(std::string name, double specificHeat, int mass, int t
 		return 404;
 	}
 	sqlite3_free(ErrMsg);
-	return 1;
+
+	return id;
+
 }
 int FileOperation::getSize()
 {

@@ -2,14 +2,16 @@
 #include <string>
 #include <vector>
 #include <modbus.h>
-
+#include <mutex>
 
 struct Conn
 {
+	
 	int ret, rc;
 	uint8_t request[180];
 	modbus_t* ctx;
 	uint16_t** registers;
+	std::mutex mtx;
 	modbus_mapping_t* mb_mapping;
 	Conn();
 	Conn(std::string,int);

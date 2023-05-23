@@ -16,6 +16,7 @@ double Belt::nextTick()
 	double in = inFurnaceTime;
 	if (inFurnaceTime < 0)
 	{
+		throw std::string("Error");
 		return -1;
 	}
 	double ret = (t / in);
@@ -33,6 +34,7 @@ void Belt::setUpThings()
 	roomTemperature = (*temper)[0];
 	FurnaceTemperature = (*temper)[1];
 	thirdTemperature = (*temper)[2];
+
 
 
 	if (maxNoOfPieces() < quanity) {
@@ -61,6 +63,17 @@ void Belt::setUpThings()
 			return;//"Error"
 		}
 	}
+
+
+}
+void Belt::getTemps()
+{
+	std::vector<double>* temper = RSP::readTemperatureData();
+	roomTemperature = (*temper)[0];
+	FurnaceTemperature = (*temper)[1];
+	thirdTemperature = (*temper)[2];
+	delete temper;
+
 
 }
 int Belt::maxNoOfPieces()

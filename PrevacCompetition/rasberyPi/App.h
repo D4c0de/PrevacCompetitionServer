@@ -15,8 +15,15 @@ namespace MainApp {
 		App();
 		~App();
 		Conn* modbus;
+
+		Belt* belt;
 		FileOperation* DataBase;
-		bool run();
+		static void ServerStart(Conn*);
+		bool Run();
+		void Begin();
+		void Heat();
+		void End();
+
 	private:
 		const int time = 100;// Base 1000, less while debug
 	};
