@@ -61,17 +61,20 @@ void Conn::connect(const char *ip,int port)
 	
 }
 void Conn::readRC(Conn* modbus) {
-
-	do {
-		modbus->rc = modbus_receive(modbus->ctx, modbus->request);
-	} while (modbus->rc == 0);
-	if (modbus->rc < 0) {
-		perror("Error in modbus receive");
-	}
-	printf("Request received rc= %d\n", modbus->rc);
-	modbus->ret = modbus_reply(modbus->ctx, modbus->request, modbus->rc, modbus->mb_mapping);//rc, request size must be given back to modbus_reply as well as "request" data
-	if (modbus->ret < 0) {
-		perror("modbus reply error");
+	while (true) {
+		do {
+			modbus->rc = modbus_receive(modbus->ctx, modbus->request);
+		} while (modbus->rc == 0);
+		if (modbus->rc < 0) {
+			perror("Error in modbus receive");
+		}
+		printf("Request received rc= %d\n", modbus->rc);
+		modbus->mtx.lock();
+		modbus->ret = modbus_reply(modbus->ctx, modbus->request, modbus->rc, modbus->mb_mapping);//rc, request size must be given back to modbus_reply as well as "request" data
+		modbus->mtx.unlock();
+		if (modbus->ret < 0) {
+			perror("modbus reply error");
+		}
 	}
 }
 void Conn::disconnect()
@@ -82,43 +85,51 @@ void Conn::disconnect()
 
 std::vector<int> Conn::reg_read_ten(Conn* con, int start)
 {
-
+	con->mtx.lock();
 	std::vector<int> ret;
 	for (int i = 0; i < 10; i++)
 	{
 		ret.push_back((*con->registers)[(start * 10) + i]);
 	}
+	con->mtx.unlock();
 	return ret;
 	
 }
 
 std::vector<int>* Conn::reg_read_muliple(Conn* con, int start, int nb)
 {
+	con->mtx.lock();
 	std::vector<int>* ret =new std::vector<int>;
 	for (int i = 0; i < nb; i++)
 	{
 		ret->push_back((*con->registers)[(start * 10) + i]);
 	}
+	con->mtx.unlock();
 	return ret;
 
 }
 
 int Conn::reg_read_single(Conn* con, int start)
 {
-	return (*con->registers)[start];
+	con->mtx.lock();
+	auto ret = (*con->registers)[start];
+	con->mtx.unlock();
+	return ret;
 }
 
 void Conn::reg_clear(Conn* con, int start)
 {
+	con->mtx.lock();
 	for (int i = 0; i < 10; i++)
 	{
 		(*con->registers)[(start * 10) + i] = 0;
 	}
-
+	con->mtx.unlock();
 }
 
 void Conn::reg_write(Conn* con, int start,int id, std::string str)
 {
+	con->mtx.lock();
 	(*con->registers)[(start * 10) + 0] = id;
 	int lenght = str.length();
 	for (int i = 0; i*2 < str.length(); i++)
@@ -137,15 +148,16 @@ void Conn::reg_write(Conn* con, int start,int id, std::string str)
 		(*con->registers)[(start * 10) + (i+1)] = low+high;
 
 	}
+	con->mtx.unlock();
 }
 void Conn::reg_write(Conn* con, int start, int value)
 {
+	con->mtx.lock();
 	(*con->registers)[start] = value;
-
+	con->mtx.unlock();
 }
 
 void Conn::reg_write_Second(Conn* con, int output)
 {
-	Conn::reg_write(con, 0, 11);
 	Conn::reg_write(con, 1, output);
 }
