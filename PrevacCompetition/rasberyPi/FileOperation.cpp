@@ -86,6 +86,21 @@ Item::Piece* FileOperation::getPiece(int ID)
 	sqlite3_free(ErrMsg);
 	return piece;
 }
+
+int FileOperation::Auth(std::string login, std::string Password)
+{
+	std::stringstream query{};
+	query << "SELECT PermissionTier FROM Account WHERE Login='" << login << "' and PasswordHash = '" << Password << "';";
+	rc = sqlite3_exec(db, query.str().c_str(), zero, 0, &ErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		sqlite3_free(ErrMsg);
+		return -1;
+	}
+	sqlite3_free(ErrMsg);
+	return 0;
+}
+
 std::vector<Item::Piece>* FileOperation::getPiece()
 {
 	std::vector<Item::Piece>* pieces=new std::vector<Item::Piece>;
@@ -98,6 +113,9 @@ std::vector<Item::Piece>* FileOperation::getPiece()
 void FileOperation::createTable() //function create table if isnt exist
 {
 	std::string query = "CREATE TABLE 'Pieces' ('ID' INTEGER NOT NULL,'Color'TEXT,'Radius'REAL,'Mass'REAL,'SpecificHeat' INTEGER,'TargetTemperatre'	INTEGER,PRIMARY KEY('ID' AUTOINCREMENT)	)";
+	rc = sqlite3_exec(db, query.c_str(), zero, 0, &ErrMsg);
+	sqlite3_free(ErrMsg);
+	query = "CREATE TABLE 'Account' ('ID' INTEGER, 'Name' TEXT, 'Login' TEXT UNIQUE, 'PasswordHash' TEXT, 'PermissionTier'INTEGER, PRIMARY KEY('ID' AUTOINCREMENT));";
 	rc = sqlite3_exec(db, query.c_str(), zero, 0, &ErrMsg);
 	sqlite3_free(ErrMsg);
 }

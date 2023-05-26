@@ -83,30 +83,29 @@ void Conn::disconnect()
 	modbus_free(ctx);
 }
 
-std::vector<int> Conn::reg_read_ten(Conn* con, int start)
+int* Conn::reg_read_ten(Conn* con, int start)
 {
+	int* ret = new int[10];
 	con->mtx.lock();
-	std::vector<int> ret;
 	for (int i = 0; i < 10; i++)
 	{
-		ret.push_back((*con->registers)[(start * 10) + i]);
+		ret[i] = (*con->registers)[(start * 10) + i];
 	}
 	con->mtx.unlock();
 	return ret;
 	
 }
 
-std::vector<int>* Conn::reg_read_muliple(Conn* con, int start, int nb)
+int* Conn::reg_read_multiple(Conn* con, int start, int nb)
 {
+	int* ret = new int[nb];
 	con->mtx.lock();
-	std::vector<int>* ret =new std::vector<int>;
 	for (int i = 0; i < nb; i++)
 	{
-		ret->push_back((*con->registers)[(start * 10) + i]);
+		ret[i] = (*con->registers)[start  + i];
 	}
 	con->mtx.unlock();
 	return ret;
-
 }
 
 int Conn::reg_read_single(Conn* con, int start)

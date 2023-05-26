@@ -1,13 +1,13 @@
 #pragma once
 
 #include "FileOperation.h"
-
+#include "Conversion.h"
 namespace input
 {
 	int* input(Conn* modbus,FileOperation* database) {
 
 
-		std::vector<int> reg;
+		int* reg;
 		while (true)
 		{
 			reg = Conn::reg_read_ten(modbus, 0);
@@ -22,7 +22,7 @@ namespace input
 			}
 			else if (reg[0] == 2)// add new type
 			{
-				std::string name;
+				std::string name =StringOperation::IntToString(reg,1);
 
 				for (int i = 1; i < 10; i++)
 				{
@@ -68,6 +68,30 @@ namespace input
 				std::cout << "Sended data to slave\n";
 				
 			}
+
+			else if (reg[0] == 4) //auth
+			{
+
+				int loginSize = Conn::reg_read_single(modbus, 1);
+				int passwordSize = Conn::reg_read_single(modbus, 2);
+				std::string loginS = StringOperation::IntToString(Conn::reg_read_multiple(modbus, 3, loginSize),loginSize);
+				std::string passwordS = StringOperation::IntToHexString(Conn::reg_read_multiple(modbus, 3 + loginSize, passwordSize),passwordSize);
+				for (size_t i = 0; i * 10 < 4 + loginSize + passwordSize; i++)
+				{
+					Conn::reg_clear(modbus, i);
+				}
+				int test=database->Auth(loginS, passwordS);
+				if (test==-1)
+				{
+
+				}
+				else
+				{
+
+				}
+			}
+			delete[] reg;
 		}
-	};
+		
+	}
 }

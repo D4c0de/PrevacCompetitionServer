@@ -20,9 +20,15 @@ struct Conn
 	static void readRC(Conn*);
 
 	void disconnect();
-	static std::vector<int> reg_read_ten(Conn*, int);
-	static std::vector<int>* reg_read_muliple(Conn*, int, int);
-
+	static int* reg_read_ten(Conn*, int);
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="Connection CTX"></param>
+	/// <param name="First"></param>
+	/// <param name="Quantity"></param>
+	/// <returns></returns>
+	static int* reg_read_multiple(Conn*,int,int);
 	static int reg_read_single(Conn*, int);
 	static void reg_clear(Conn*,int);
 	static void reg_write(Conn*,int,int,std::string);

@@ -26,10 +26,7 @@ Item::Piece::Piece(int id,std::string name, double radius, double mass, double s
 Item::Piece::~Piece()
 {
 }
-/// <summary>
-/// 
-/// </summary>
-/// <returns>Size of pieces m^2</returns>
+
 double Item::Piece::GetSize()
 {
 	double size;

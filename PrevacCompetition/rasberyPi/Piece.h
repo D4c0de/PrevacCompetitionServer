@@ -19,6 +19,10 @@ namespace Item {
 		/// <param name="TargetTemperature"></param>
 		Piece(int,std::string, double, double, double, double);
 		~Piece();
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>Size of pieces m^2</returns>
 		double GetSize();
 		int ID;
 		std::string color;
