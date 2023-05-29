@@ -1,5 +1,5 @@
-//Verison 1.1.1
-//Required version of desktopApp 1.0.2
+//Verison 1.2.1
+//Required version of desktopApp 1.1.0
 #include "App.h"
 #include <thread>
 int main() {

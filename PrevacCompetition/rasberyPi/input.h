@@ -83,11 +83,12 @@ namespace input
 				int test=database->Auth(loginS, passwordS);
 				if (test==-1)
 				{
-
+					Conn::reg_write(modbus, 0, 11);
 				}
 				else
 				{
-
+					Conn::reg_write_token(modbus, database->tokens[database->tokens.size() - 1].tokenID, database->tokens[database->tokens.size() - 1].tier);
+					Conn::reg_write(modbus, 0, 11);
 				}
 			}
 			delete[] reg;

@@ -32,6 +32,15 @@ int callback_size(void* data, int argc, char** argv, char** azColName) {
 int zero(void* NotUsed, int argc, char** argv, char** azColName) {
 	return 0;
 }
+int NewToken(void* data, int argc, char** argv, char** azColName) {
+	if (argc==0)
+	{
+		return -1;
+	}
+	std::vector<Token>* token = static_cast<std::vector<Token>*>(data);
+	token->push_back(Token(std::stoi(argv[0]), std::stoi(argv[1])));
+	return 0;
+}
 FileOperation::FileOperation()
 {
 	ErrMsg = nullptr;
@@ -90,8 +99,8 @@ Item::Piece* FileOperation::getPiece(int ID)
 int FileOperation::Auth(std::string login, std::string Password)
 {
 	std::stringstream query{};
-	query << "SELECT PermissionTier FROM Account WHERE Login='" << login << "' and PasswordHash = '" << Password << "';";
-	rc = sqlite3_exec(db, query.str().c_str(), zero, 0, &ErrMsg);
+	query << "SELECT ID,PermissionTier FROM Account WHERE Login='" << login << "' and PasswordHash = '" << Password << "';";
+	rc = sqlite3_exec(db, query.str().c_str(), NewToken, &tokens, &ErrMsg);
 	if (rc != SQLITE_OK)
 	{
 		sqlite3_free(ErrMsg);
@@ -99,6 +108,21 @@ int FileOperation::Auth(std::string login, std::string Password)
 	}
 	sqlite3_free(ErrMsg);
 	return 0;
+}
+
+uint16_t* FileOperation::getTokenID(int id)
+{
+	return tokens[id].tokenID;
+}
+
+int FileOperation::getTokenUserId(int id)
+{
+	return tokens[id].userID;
+}
+
+int FileOperation::getTokenPermit(int id)
+{
+	return tokens[id].tier;
 }
 
 std::vector<Item::Piece>* FileOperation::getPiece()
