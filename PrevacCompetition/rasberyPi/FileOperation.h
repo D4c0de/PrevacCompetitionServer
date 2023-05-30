@@ -31,5 +31,5 @@ public:
 private:
 	char* ErrMsg;
 	int rc;
-	void createTable();
+	void Initialize();
 };

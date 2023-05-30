@@ -32,6 +32,7 @@ struct Conn
 	static int reg_read_single(Conn*, int);
 	static void reg_clear(Conn*,int);
 	static void reg_write_token(Conn* con, uint16_t* token, int tier);
+	static uint16_t* Reg_read_token(Conn*);
 	static void reg_write(Conn*,int,int,std::string);
 	static void reg_write(Conn*, int, int);
 	static void reg_write_Second(Conn*, int);

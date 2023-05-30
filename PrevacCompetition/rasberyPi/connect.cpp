@@ -133,8 +133,18 @@ void Conn::reg_write_token(Conn* con, uint16_t* token, int tier)
 	{
 		(*con->registers)[2 + i] = token[i];
 	}
-	(*con->registers)[8] = tier;
+	(*con->registers)[1] = tier;
 	con->mtx.unlock();
+}
+
+uint16_t* Conn::Reg_read_token(Conn* con)
+{
+	uint16_t* ret = new uint16_t[6];
+	for (int i = 0; i < 6; i++)
+	{
+		ret[i] = (*con->registers)[i + 2];
+	}
+	return ret;
 }
 
 void Conn::reg_write(Conn* con, int start,int id, std::string str)

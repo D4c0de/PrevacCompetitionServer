@@ -4,6 +4,28 @@
 #include "Conversion.h"
 namespace input
 {
+	bool compare(uint16_t* a, uint16_t* b) {
+		for (int x = 0; x < 6; x++)
+		{
+			if (a[x] != b[x])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	int	Auth(Conn* modbus,std::vector<Token>* tokens) {
+		Conn::reg_write_Second(modbus,101);
+		uint16_t* inputTokenID =Conn::Reg_read_token(modbus);
+		for (int i = 0; i < tokens->size(); i++)
+		{
+			if (compare(inputTokenID,(*tokens)[i].tokenID))
+			{
+				return (*tokens)[i].tier;
+			}
+		}
+		return -1;
+	}
 	int* input(Conn* modbus,FileOperation* database) {
 
 
@@ -22,8 +44,11 @@ namespace input
 			}
 			else if (reg[0] == 2)// add new type
 			{
+				if (Auth(modbus,&database->tokens)<3)
+				{
+					Conn::reg_write_Second(modbus,404);
+				}
 				std::string name =StringOperation::IntToString(reg,1);
-
 				for (int i = 1; i < 10; i++)
 				{
 					if (reg[i] == 0) {
@@ -68,7 +93,6 @@ namespace input
 				std::cout << "Sended data to slave\n";
 				
 			}
-
 			else if (reg[0] == 4) //auth
 			{
 
